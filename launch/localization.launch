@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<launch>
+	<node pkg="tf" type="static_transform_publisher" name="b2a" args="0 0 0 0 0 0 base_link android 10" /> <!-- align x forward -->
+	<!--<node pkg="tf" type="static_transform_publisher" name="m2o" args="0 0 0 0 0 0 map odom 100" />--> <!-- align x forward -->
+
+	<!-- Localization - local -->
+	<node pkg="robot_localization" type="ukf_localization_node" name="ukf_localization_local" output="screen">
+		<rosparam command="load" file="$(find redbot_odom)/config/localization_local.yaml" />
+		<remap from="/odometry/filtered" to="/odometry/filtered/local"/>
+	</node>
+
+	<!-- Localization - global -->
+	<node pkg="robot_localization" type="ukf_localization_node" name="ukf_localization_global" output="screen">
+		<rosparam command="load" file="$(find redbot_odom)/config/localization_global.yaml" />
+		<remap from="/odometry/filtered" to="/odometry/filtered/global"/>
+	</node>
+
+	<!-- NavSat Transform -->
+	<node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" output="screen">
+		<param name="magnetic_declination_radians" value="0"/> <!-- gives true north anyways -->
+		<param name="yaw_offset" value="0"/>
+		<param name="zero_altitude" value="false"/> <!-- 88m ish above, I think? -->
+		<param name="broadcast_utm_transform" value="true"/>
+		<param name="publish_filtered_gps" value="true"/>
+
+		<remap from="imu/data" to="android/imu" />
+		<remap from="gps/fix" to="android/gps" />
+		<remap from="/odometry/filtered" to="odometry/filtered/global"/>
+	</node>
+
+	<!-- Show Path -->
+	<node pkg="hector_trajectory_server" type="hector_trajectory_server" name="hector_trajectory_server">
+		<param name="target_frame_name" value="map"/>
+		<param name="source_frame_name" value="base_link"/>
+	</node>
+
+	<!-- Visualization -->
+	<!--<node pkg="rqt_plot" type="rqt_plot" name="rqt_plot" output="screen" args="/odometry/filtered/pose/twist/twist"/>-->
+	<!--<node pkg="rviz" type="rviz" name="rviz" args="-d $(find test_android)/launch/localization.rviz"/>-->
+
+	<!-- Localization - Global -->
+	<!--<node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_global" output="screen">
+		<rosparam command="load" file="/home/jamiecho/Miscellaneous/test_localization/localization_global.yaml" />
+		<remap from="/odometry/filtered" to="/odometry/filtered/global"/>
+	</node>-->
+</launch>

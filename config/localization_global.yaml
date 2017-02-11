@@ -1,0 +1,42 @@
+odom_frame: odom
+base_link_frame: base_link
+world_frame: map 
+
+publish_tf: true
+two_d_mode : true
+frequency : 100
+
+# relative : remove first measurement
+# differential : convert to velocity
+
+# Local
+odom0: /odometry/filtered/local
+odom0_config: [true,true,true, # lin pos
+               false,false,true, # ang or
+               true,true,true, # lin vel
+               false,false,true, # ang vel
+               true,true,true] # lin acc
+odom0_differential: true # TODO : Tweak?
+odom0_queue_size: 10
+
+# IMU Again
+imu0: /android/imu
+imu0_config: [false, false, false, # no position data
+              true, true, true, # Orientation
+              false, false, false, # no velocity data
+              true, true, true, # Angular Velocity
+              true, true, true] # Linear Acceleration #TODO : disable y-direction acceleration for diff-drive robot!
+imu0_differential: false # Absolute Orientation (w.r.t magnetic field)
+imu0_queue_size: 10
+imu0_remove_gravitational_acceleration: false # already removed
+
+# GPS
+#odom1: /odometry/gps
+#odom1_config: [true, true, true, # pos x y z
+#               false, false, false, # local orientation x y z # Pose
+#               false, false, false, # lin_vel x y z
+#               false, false, false, #ang_vel x y z # Twist
+#               false, false, false] # lin_acc x y z # No Accel
+##odom1_relative: true 
+#odom1_differential: true #if turned on, make position --> velocity
+#odom1_queue_size: 10
